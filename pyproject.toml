@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "polyvector"
+name = "polyvector-search"
 version = "0.1.0"
 description = "High-performance in-engine multi-field hybrid search for PostgreSQL using vertical HNSW vectors and native BM25."
 readme = "README.md"

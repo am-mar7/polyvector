@@ -1,5 +1,5 @@
 {
-  "name": "polyvector-core",
+  "name": "polyvector-search",
   "version": "0.1.1",
   "description": "High-performance in-engine multi-field hybrid search for PostgreSQL (Vectors + BM25) with zero API tokens.",
   "main": "dist/index.js",
