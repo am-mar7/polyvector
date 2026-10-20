@@ -1,7 +1,30 @@
 # ⚡ PolyVector
 
-> **High-Performance, In-Engine Multi-Field Hybrid Search for PostgreSQL.**  
-> Native vector embeddings + length-normalized BM25 full-text search combined in a **single unified SQL query**—100% local, zero API tokens, and universal ORM compatibility.
+> **The Modern In-Engine Alternative to Elasticsearch & OpenSearch for PostgreSQL.**  
+> High-performance multi-field hybrid search fusing vertical HNSW vector indexes with native length-normalized BM25 full-text search into a **single parameterized SQL query**—100% local, zero API tokens, 85% less RAM, and zero external search clusters.
+
+[![PyPI version](https://img.shields.io/pypi/v/polyvector-search.svg?color=blue)](https://pypi.org/project/polyvector-search/)
+[![npm version](https://img.shields.io/npm/v/polyvector-search.svg?color=green)](https://www.npmjs.com/package/polyvector-search)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%20--%2017-blue.svg)](https://www.postgresql.org/)
+[![pgvector](https://img.shields.io/badge/pgvector-0.5%2B-orange.svg)](https://github.com/pgvector/pgvector)
+
+---
+
+## 💡 Stop Running a Second Database for Search
+
+Traditional search stacks require operating **Elasticsearch, OpenSearch, or Algolia** alongside your primary PostgreSQL database. This introduces:
+- **Fragile Sync Pipelines:** CDC/Debezium, Kafka, or Logstash workers that lag, fail, or go out of sync.
+- **Split-Brain & Consistency Bugs:** Documents updated in Postgres aren't immediately searchable or transactionally consistent.
+- **Massive RAM Overhead:** 2.5 GB to 4+ GB of JVM heap memory just to keep search running.
+- **High Cloud Costs:** Expensive separate VM clusters or high monthly SaaS bills.
+
+**PolyVector turns PostgreSQL into an enterprise-grade search engine:**
+- ⚡ **3.2× lower latency** than Elasticsearch 8.x hybrid (40ms vs 132ms p50).
+- 📉 **85% less RAM consumed** (~350MB vs 2.5–4GB JVM heap).
+- 💾 **61% smaller disk footprint** (298MB vs 767MB index size).
+- 🔒 **ACID Compliant:** Updates are instantly searchable with transactional consistency.
+- 💸 **Zero API Fees:** 100% local CPU ONNX embeddings (`bge-small-en-v1.5`). No OpenAI API bills or rate limits.
 
 ---
 
@@ -64,10 +87,10 @@ PolyVector was rigorously evaluated against **Elasticsearch 8.x** and **PostgreS
 
 ```bash
 # Core package (psycopg2 + fastembed)
-pip install polyvector
+pip install polyvector-search
 
 # Optional: with SQLAlchemy adapter
-pip install "polyvector[sqlalchemy]"
+pip install "polyvector-search[sqlalchemy]"
 ```
 
 ### 2. Complete Setup & Search Flow
@@ -128,22 +151,24 @@ for item in response.items:
 
 ---
 
-## 🟨 JavaScript & TypeScript Guide (`@polyvector/core`)
+## 🟨 JavaScript & TypeScript Guide (`polyvector-search`)
 
 PolyVector is designed with identical architecture for Node.js, Bun, and Deno using `@xenova/transformers` for local ONNX CPU inference.
 
 ### 1. Installation
 
 ```bash
-npm install @polyvector/core
+npm install polyvector-search
 # or
-pnpm add @polyvector/core
+pnpm add polyvector-search
+# or
+yarn add polyvector-search
 ```
 
 ### 2. TypeScript Quickstart
 
 ```typescript
-import { PolyVectorIndex } from "@polyvector/core";
+import { PolyVectorIndex } from "polyvector-search";
 import { Pool } from "pg";
 
 const pgPool = new Pool({
@@ -193,7 +218,7 @@ Use PolyVector's `compileQuery()` to generate the parameterized SQL, then execut
 
 ```typescript
 import { PrismaClient } from "@prisma/client";
-import { PolyVectorIndex } from "@polyvector/core";
+import { PolyVectorIndex } from "polyvector-search";
 
 const prisma = new PrismaClient();
 const index = new PolyVectorIndex({
@@ -233,7 +258,7 @@ Drizzle provides native raw execution via `sql.raw` or `db.execute`:
 ```typescript
 import { drizzle } from "drizzle-orm/node-postgres";
 import { sql } from "drizzle-orm";
-import { PolyVectorIndex } from "@polyvector/core";
+import { PolyVectorIndex } from "polyvector-search";
 
 const db = drizzle(process.env.DATABASE_URL!);
 const index = new PolyVectorIndex({

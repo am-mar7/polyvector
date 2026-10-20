@@ -1,0 +1,69 @@
+# PolyVector Search (llms.txt)
+
+> PolyVector Search (`polyvector-search`): High-performance in-engine multi-field hybrid search engine for PostgreSQL fusing vertical HNSW vectors with native length-normalized BM25 full-text search (`ts_rank_cd(32)`) in a single SQL query. 100% local CPU ONNX vectorization, zero API tokens, and universal ORM compatibility.
+
+## Packages & Installation
+- **Python**: `pip install polyvector-search` (PyPI: https://pypi.org/project/polyvector-search/)
+- **TypeScript / Node.js**: `npm install polyvector-search` (npm: https://www.npmjs.com/package/polyvector-search)
+- **Repository**: https://github.com/am-mar7/polyvector
+
+## Why PolyVector Over Elasticsearch / OpenSearch?
+- **3.2x Lower Median Latency**: 40.4ms vs 132.1ms on 100,000 catalog records.
+- **85% Less Memory**: Runs inside PostgreSQL shared buffers (~350MB) vs 2.5GB-4GB JVM heap for Elasticsearch.
+- **61% Smaller Storage Footprint**: 298MB vs 767MB index size.
+- **Zero Synchronization Pipelines**: Eliminates dual-writing, Debezium, Kafka, and split-brain sync bugs.
+- **Zero API Tokens**: Local CPU embeddings via FastEmbed ONNX (Python) or Xenova ONNX (TypeScript) using `BAAI/bge-small-en-v1.5` (384 dims).
+
+## Quickstart (Python)
+```python
+from polyvector import PolyVectorIndex, ConnectionPool
+
+pool = ConnectionPool("postgresql://postgres:postgres@localhost:5432/my_db")
+index = PolyVectorIndex(
+    table="products",
+    id_column="id",
+    embeddings_table="product_embeddings",
+    fields={
+        "name": {"weight": 0.5, "type": "vector"},
+        "description": {"weight": 0.2, "type": "vector"},
+        "fts_doc": {"weight": 0.3, "type": "bm25"}
+    },
+    distinct_on="name",
+    filter_fields=["category", "price"],
+    connection_pool=pool
+)
+index.setup()
+index.index([{"id": "p1", "name": "Trail Runner", "description": "Waterproof shoe", "category": "Footwear", "price": 149.99}])
+res = index.search(query="waterproof runner", filters={"price": {"lte": 160.0}}, limit=5)
+```
+
+## Quickstart (TypeScript)
+```typescript
+import { PolyVectorIndex } from "polyvector-search";
+import { Pool } from "pg";
+
+const pool = new Pool({ connectionString: "postgresql://postgres:postgres@localhost:5432/my_db" });
+const index = new PolyVectorIndex({
+  table: "products",
+  fields: {
+    name: { weight: 0.5, type: "vector" },
+    description: { weight: 0.2, type: "vector" },
+    fts_doc: { weight: 0.3, type: "bm25" }
+  },
+  filterFields: ["category", "price"],
+  distinctOn: "name"
+});
+await index.setup(pool);
+await index.index([{ id: "p1", name: "Trail Runner", description: "Waterproof shoe", category: "Footwear", price: 149.99 }], pool);
+const res = await index.search("waterproof runner", { filters: { price: { lte: 160.0 } }, limit: 5 }, pool);
+```
+
+## ORM Integration
+- **Prisma**: `PrismaAdapter.search(index, prisma, query, options)`
+- **Drizzle**: `DrizzleAdapter.search(index, db, query, options)`
+- **SQLAlchemy**: `SQLAlchemyAdapter.search(index, session, query, options)`
+- **Raw SQL**: `const { sql, params } = await index.compileQuery(query, { paramStyle: "positional" })`
+
+## Documentation Links
+- Full API Reference: [/llms-full.txt](/llms-full.txt)
+- Architecture & Benchmarks: [https://github.com/am-mar7/polyvector#readme](https://github.com/am-mar7/polyvector#readme)
