@@ -1,0 +1,41 @@
+{
+  "name": "polyvector-core",
+  "version": "0.1.1",
+  "description": "High-performance in-engine multi-field hybrid search for PostgreSQL (Vectors + BM25) with zero API tokens.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": [
+    "search",
+    "postgres",
+    "pgvector",
+    "hybrid-search",
+    "bm25",
+    "embeddings",
+    "drizzle",
+    "prisma"
+  ],
+  "author": "PolyVector Team",
+  "license": "MIT",
+  "dependencies": {
+    "@xenova/transformers": "^2.17.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/pg": "^8.11.0",
+    "pg": "^8.23.1",
+    "typescript": "^5.4.0"
+  },
+  "peerDependencies": {
+    "pg": "^8.11.0"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    }
+  }
+}
